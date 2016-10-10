@@ -1,0 +1,50 @@
+--- os_detect.old.py	2016-10-09 23:08:24.161935416 +0200
++++ os_detect.new.py	2016-10-09 20:26:44.088508885 +0200
+@@ -507,6 +507,31 @@
+             return ''
+         raise OsNotDetected('called in incorrect OS') 
+ 
++class Void(OsDetector):
++    """
++    Detect Void Linux.
++    """
++    def __init__(self, lsb_release_file="/usr/bin/lsb_release"):
++	self._lsb_release_file = lsb_release_file
++	self._os_description = "Void Linux"
++
++    def is_os(self):
++        if os.path.exists(self._lsb_release_file):
++            std_out = _read_stdout([self._lsb_release_file, "-d"]).split()
++            return std_out[1] == "Void" and std_out[2] == "Linux"
++        else:
++            return False
++
++    def get_version(self):
++        if self.is_os():
++            return ""
++        raise OsNotDetected('called in incorrect OS')
++
++    def get_codename(self):
++        if self.is_os():
++            return ""
++        raise OsNotDetected('called in incorrect OS')
++
+ class Windows(OsDetector):
+     """
+     Detect Windows OS.
+@@ -651,6 +676,7 @@
+ OS_RHEL='rhel'
+ OS_SLACKWARE='slackware'
+ OS_UBUNTU='ubuntu'
++OS_VOIDLINUX='void'
+ OS_WINDOWS='windows'
+ 
+ OsDetect.register_default(OS_ARCH, Arch())
+@@ -672,6 +698,7 @@
+ OsDetect.register_default(OS_RHEL, Rhel())
+ OsDetect.register_default(OS_SLACKWARE, Slackware())
+ OsDetect.register_default(OS_UBUNTU, LsbDetect("Ubuntu"))
++OsDetect.register_default(OS_VOIDLINUX, Void())
+ OsDetect.register_default(OS_WINDOWS, Windows())
+ 
+ 
